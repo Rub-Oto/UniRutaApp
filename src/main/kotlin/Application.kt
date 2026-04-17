@@ -7,20 +7,20 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
 
 fun main() {
-    // Esto fuerza al servidor a iniciar en el puerto 8080 manualmente
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+    // CAMBIO CRÍTICO: Lee el puerto de Render o usa 8080 por defecto
+    val port = System.getenv("PORT")?.toInt() ?: 8080
+
+    embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }
 
 fun Application.module() {
-    // 1. Inicializamos la base de datos de XAMPP
+    // Inicializamos la base de datos
     DatabaseFactory.init()
 
-    // 2. Activamos el soporte para JSON
     install(ContentNegotiation) {
         json()
     }
 
-    // 3. Configuramos las rutas (están en Routing.kt)
     configureRouting()
 }
