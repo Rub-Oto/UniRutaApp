@@ -1,5 +1,5 @@
 # 1. Usamos una imagen de Java (JDK 17 es la estándar para Ktor)
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-focal
 
 # 2. Creamos una carpeta para la app
 WORKDIR /app
