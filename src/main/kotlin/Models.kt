@@ -3,6 +3,7 @@ package com.example
 import org.jetbrains.exposed.sql.Table
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class LoginRequest(val correo: String, val contrasena: String)
 
@@ -57,3 +58,11 @@ data class UbicacionRequest(val idChofer: Int, val latitud: Double, val longitud
 
 @Serializable
 data class UbicacionResponse(val latitud: Double, val longitud: Double)
+object UbicacionesUnidades : Table("ubicaciones_unidades") {
+    val idChofer = integer("id_chofer")
+    val latitud = double("latitud")
+    val longitud = double("longitud")
+    // Lo cambiamos a varchar para evitar errores de librerías
+    val ultimaActualizacion = varchar("ultima_actualizacion", 50).default("2026-04-22 00:00:00")
+    override val primaryKey = PrimaryKey(idChofer)
+}

@@ -1,31 +1,35 @@
-package com.example
+package com.example.dao
 
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Table // <--- ¡ESTA FALTA!
-import org.jetbrains.exposed.sql.SchemaUtils
+import com.example.*
+import kotlinx.coroutines.Dispatchers
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
     fun init() {
         val driverClassName = "com.mysql.cj.jdbc.Driver"
-        val jdbcUrl = "jdbc:mysql://localhost:3306/uniruta_db"
-        val user = "root"
-        val password = ""
 
-        Database.connect(jdbcUrl, driverClassName, user, password)
-        println("¡Conectado exitosamente a la base de datos!")
+        // Usamos el host y puerto de tu proxy de Railway
+        val jdbcURL = "jdbc:mysql://mainline.proxy.rlwy.net:37562/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
 
-        // Esto crea la tabla automáticamente si no existe en XAMPP
-        transaction {
-            SchemaUtils.create(UbicacionesTable)
+        // IMPORTANTE: Aquí cambiamos root por tu nuevo usuario
+        val user = "uniruta_user"
+        val password = "UniRuta2026!"
+
+        val database = Database.connect(
+            url = jdbcURL,
+            driver = driverClassName,
+            user = user,
+            password = password
+        )
+
+        transaction(database) {
+            // Creamos las tablas con el nuevo usuario
+            SchemaUtils.create(UsuariosTestTable, ReportesRutasTable, UbicacionesUnidades)
         }
     }
-}
 
-// LA TABLA VA AFUERA DEL OTRO OBJECT (O debajo, pero con sus propias llaves)
-object UbicacionesTable : Table("ubicaciones_unidades") {
-    val idChofer = integer("id_chofer")
-    val latitud = double("latitud")
-    val longitud = double("longitud")
-    override val primaryKey = PrimaryKey(idChofer)
+    suspend fun <T> dbQuery(block: suspend () -> T): T =
+        newSuspendedTransaction(Dispatchers.IO) { block() }
 }
