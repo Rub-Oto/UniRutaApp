@@ -9,7 +9,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 
 fun main() {
-    // ESTA LÍNEA ES LA MAGIA: Render siempre manda el puerto en una variable llamada PORT
+    // Render nos asigna un puerto dinámico en la variable PORT
     val port = System.getenv("PORT")?.toInt() ?: 8080
 
     embeddedServer(Netty, port = port, host = "0.0.0.0") {
