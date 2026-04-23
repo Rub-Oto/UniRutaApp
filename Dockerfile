@@ -1,15 +1,22 @@
-# 1. Usamos una imagen de Java (JDK 17 es la estándar para Ktor)
-FROM eclipse-temurin:17-jdk-focal
+# 1. Usamos una imagen que tiene Java y Gradle listos
+FROM gradle:7.6-jdk17 AS build
 
-# 2. Creamos una carpeta para la app
+# 2. Creamos la carpeta de trabajo
 WORKDIR /app
 
-# 3. Copiamos el archivo "fat jar" que genera IntelliJ/Gradle
-# Asegúrate de que el nombre coincida con el que genera tu proyecto
-COPY build/libs/*-all.jar app.jar
+# 3. Copiamos todo tu código al servidor de Render
+COPY --chown=gradle:gradle . .
 
-# 4. Exponemos el puerto que usará Render
+# 4. Construimos el archivo ejecutable (JAR) ahí mismo
+RUN gradle shadowJar --no-daemon
+
+# 5. Pasamos a una imagen más ligera para correr la app
+FROM eclipse-temurin:17-jdk-focal
+WORKDIR /app
+
+# 6. Traemos el archivo que acabamos de construir
+COPY --from=build /app/build/libs/*-all.jar app.jar
+
+# 7. Exponemos el puerto y arrancamos
 EXPOSE 8080
-
-# 5. Comando para arrancar el servidor
 CMD ["java", "-jar", "app.jar"]
