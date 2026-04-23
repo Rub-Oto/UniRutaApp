@@ -1,6 +1,7 @@
 package com.example.plugins
 
-import com.example.* import io.ktor.http.*
+import com.example.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -10,12 +11,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureRouting() {
     routing {
-        // Ruta de prueba
+        // 1. PRUEBA
         get("/") {
             call.respondText("¡Servidor UniRuta encendido y conectado a Railway!")
         }
 
-        // Login
+        // 2. LOGIN
         post("/login") {
             try {
                 val request = call.receive<LoginRequest>()
@@ -40,7 +41,7 @@ fun Application.configureRouting() {
             }
         }
 
-        // Registro
+        // 3. REGISTRO
         post("/registrar") {
             try {
                 val request = call.receive<RegistroRequest>()
@@ -63,7 +64,63 @@ fun Application.configureRouting() {
             }
         }
 
-        // Actualizar ubicación
+        // 4. OBTENER CHOFERES (Admin)
+        get("/choferes") {
+            try {
+                val choferes = transaction {
+                    UsuariosTestTable.selectAll()
+                        .where { UsuariosTestTable.rol eq "Chofer" }
+                        .map {
+                            ChoferResponse(
+                                id = it[UsuariosTestTable.id],
+                                nombre = it[UsuariosTestTable.nombre],
+                                correo = it[UsuariosTestTable.correo],
+                                rol = it[UsuariosTestTable.rol]
+                            )
+                        }
+                }
+                call.respond(choferes)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Error: ${e.localizedMessage}")
+            }
+        }
+
+        // 5. OBTENER REPORTES (Admin)
+        get("/reportes") {
+            try {
+                val reportes = transaction {
+                    ReportesRutasTable.selectAll().map {
+                        ReporteDetalle( // <--- Asegúrate que se llame igual que en Models.kt
+                            id = it[ReportesRutasTable.id],
+                            nombreChofer = "ID Chofer: ${it[ReportesRutasTable.idChofer]}",
+                            tiempoTotal = it[ReportesRutasTable.tiempoTotal],
+                            fecha = it[ReportesRutasTable.fecha] ?: "Sin fecha"
+                        )
+                    }
+                }
+                call.respond(reportes)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Error: ${e.localizedMessage}")
+            }
+        }
+
+        // 6. FINALIZAR RUTA
+        post("/rutas/finalizar") {
+            try {
+                val request = call.receive<ReporteRequest>()
+                transaction {
+                    ReportesRutasTable.insert {
+                        it[idChofer] = request.idChofer
+                        it[tiempoTotal] = request.tiempoTotal
+                    }
+                }
+                call.respond(HttpStatusCode.Created, RegistroResponse("success", "Ruta finalizada"))
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, RegistroResponse("error", e.localizedMessage))
+            }
+        }
+
+        // 7. ACTUALIZAR UBICACIÓN
         post("/actualizar-ubicacion") {
             try {
                 val request = call.receive<UbicacionRequest>()
