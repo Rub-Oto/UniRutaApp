@@ -1,4 +1,4 @@
-package com.example.com.example
+package com.example
 
 import org.jetbrains.exposed.sql.Table
 import kotlinx.serialization.Serializable

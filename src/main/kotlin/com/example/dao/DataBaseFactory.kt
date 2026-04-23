@@ -1,8 +1,6 @@
 package com.example.dao
 
-import com.example.com.example.ReportesRutasTable
-import com.example.com.example.UbicacionesUnidades
-import com.example.com.example.UsuariosTestTable
+import com.example.* // Esto importa UsuariosTestTable, ReportesRutasTable, etc.
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -12,10 +10,8 @@ object DatabaseFactory {
     fun init() {
         val driverClassName = "com.mysql.cj.jdbc.Driver"
 
-        // Usamos el host y puerto de tu proxy de Railway
+        // Datos de tu base en Railway
         val jdbcURL = "jdbc:mysql://mainline.proxy.rlwy.net:37562/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
-
-        // IMPORTANTE: Aquí cambiamos root por tu nuevo usuario
         val user = "uniruta_user"
         val password = "UniRuta2026!"
 
@@ -27,7 +23,7 @@ object DatabaseFactory {
         )
 
         transaction(database) {
-            // Creamos las tablas con el nuevo usuario
+            // Esto crea las tablas si no existen
             SchemaUtils.create(UsuariosTestTable, ReportesRutasTable, UbicacionesUnidades)
         }
     }
