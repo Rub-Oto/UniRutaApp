@@ -1,12 +1,21 @@
 package com.example
 
+import com.example.com.example.LoginRequest
+import com.example.com.example.LoginResponse
+import com.example.com.example.RegistroRequest
+import com.example.com.example.RegistroResponse
+import com.example.com.example.ReporteRequest
+import com.example.com.example.ReportesRutasTable
+import com.example.com.example.UbicacionRequest
+import com.example.com.example.UbicacionResponse
+import com.example.com.example.UbicacionesUnidades
+import com.example.com.example.UsuariosTestTable
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureRouting() {

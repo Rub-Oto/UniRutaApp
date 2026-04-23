@@ -1,6 +1,8 @@
 package com.example.dao
 
-import com.example.*
+import com.example.com.example.ReportesRutasTable
+import com.example.com.example.UbicacionesUnidades
+import com.example.com.example.UsuariosTestTable
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
